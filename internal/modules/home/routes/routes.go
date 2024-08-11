@@ -15,10 +15,4 @@ func Routes(router *gin.Engine) {
 			"appName": viper.Get("App.Name"),
 		})
 	})
-	router.GET("/about", func(c *gin.Context) {
-		html.Render(c, http.StatusOK, "modules/home/html/about", gin.H{
-			"title":   "About page",
-			"appName": viper.Get("App.Name"),
-		})
-	})
 }
