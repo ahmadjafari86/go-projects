@@ -1,3 +1,6 @@
 /.idea
+/.vscode
 /config/config.yml
+/local_templates
+
 
