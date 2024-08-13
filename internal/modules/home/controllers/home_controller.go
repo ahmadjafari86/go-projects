@@ -1,19 +1,19 @@
 package controllers
 
 import (
-	ArticleRepository "blog/internal/modules/article/repositories"
+	ArticleService "blog/internal/modules/article/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Controller struct {
-	articleRepository ArticleRepository.ArticleRepositoryInterface
+	articleService ArticleService.ArticleServiceInterface
 }
 
 func New() *Controller {
 	return &Controller{
-		articleRepository: ArticleRepository.New(),
+		articleService: ArticleService.New(),
 	}
 }
 
@@ -22,6 +22,7 @@ func (controller *Controller) Index(c *gin.Context) {
 	// 	"title": "Home page",
 	// })
 	c.JSON(http.StatusOK, gin.H{
-		"articles": controller.articleRepository.List(8),
+		"featured": controller.articleService.GetFeaturedArticles(),
+		"stories":  controller.articleService.GetStoriesArticles(),
 	})
 }
