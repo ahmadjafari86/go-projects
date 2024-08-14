@@ -21,6 +21,6 @@ func (articleService *ArticleService) GetFeaturedArticles() ArticleResponse.Arti
 }
 
 func (articleService *ArticleService) GetStoriesArticles() ArticleResponse.Articles {
-	articles := articleService.articleRepository.List(4)
+	articles := articleService.articleRepository.List(6)
 	return ArticleResponse.ToArticles(articles)
 }
