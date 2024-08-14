@@ -1,10 +1,13 @@
 package routes
 
 import (
-	homeRoutes "blog/internal/modules/home/routes"
+	ArticleRoutes "blog/internal/modules/article/routes"
+	HomeRoutes "blog/internal/modules/home/routes"
+
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(router *gin.Engine) {
-	homeRoutes.Routes(router)
+	HomeRoutes.Routes(router)
+	ArticleRoutes.Routes(router)
 }
