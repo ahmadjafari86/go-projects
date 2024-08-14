@@ -1,8 +1,8 @@
 package services
 
-import ArticleModels "blog/internal/modules/article/models"
+import ArticleResponse "blog/internal/modules/article/responses"
 
 type ArticleServiceInterface interface {
-	GetFeaturedArticles() []ArticleModels.Article
-	GetStoriesArticles() []ArticleModels.Article
+	GetFeaturedArticles() ArticleResponse.Articles
+	GetStoriesArticles() ArticleResponse.Articles
 }
