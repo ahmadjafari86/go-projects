@@ -21,8 +21,14 @@ func New() *Controller {
 func (controller *Controller) Show(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"message": "Error in parsing ID param"})
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Error in parsing ID param"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"Article ID is ": id})
+
+	article, err := controller.articleService.Find(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"Article: ": article})
 }
