@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"blog/internal/modules/user/requests/auth"
+	authModels "blog/internal/modules/user/requests/auth"
 	userServices "blog/internal/modules/user/services"
+	"blog/pkg/errors"
 	"blog/pkg/html"
 	"fmt"
 	"net/http"
@@ -27,9 +28,12 @@ func (controller *Controller) Register(c *gin.Context) {
 }
 
 func (controller *Controller) HandleRegister(c *gin.Context) {
-	var request auth.RegisterRequest
+	var request authModels.RegisterRequest
 	if err := c.ShouldBind(&request); err != nil {
-		c.Redirect(http.StatusFound, "/register")
+		errors.Init()
+		errors.SetFromErrors(err)
+		c.JSON(http.StatusOK, gin.H{"errors": errors.Get()})
+		// c.Redirect(http.StatusFound, "/register")
 		return
 	}
 
