@@ -6,9 +6,11 @@ import (
 	"blog/pkg/converters"
 	"blog/pkg/errors"
 	"blog/pkg/html"
+	"blog/pkg/old"
 	"blog/pkg/sessions"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,7 +27,7 @@ func New() *Controller {
 
 func (controller *Controller) Register(c *gin.Context) {
 	html.Render(c, http.StatusOK, "modules/user/html/register", gin.H{
-		"title": "register",
+		"title": "Register",
 	})
 }
 
@@ -35,6 +37,24 @@ func (controller *Controller) HandleRegister(c *gin.Context) {
 		errors.Init()
 		errors.SetFromErrors(err)
 		sessions.Set(c, "errors", converters.MapToString(errors.Get()))
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "old", converters.UrlValuesToString(old.Get()))
+
+		c.Redirect(http.StatusFound, "/register")
+		return
+	}
+
+	if controller.userService.CheckUserExists(request.Email) {
+		errors.Init()
+		errors.Add("Email", "Email address already exists")
+		sessions.Set(c, "errors", converters.MapToString(errors.Get()))
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "old", converters.UrlValuesToString(old.Get()))
+
 		c.Redirect(http.StatusFound, "/register")
 		return
 	}
@@ -45,7 +65,17 @@ func (controller *Controller) HandleRegister(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/register")
 		return
 	}
-
+	sessions.Set(c, "auth", strconv.Itoa(int(user.ID)))
 	fmt.Printf("User created successfully with a name %s", user.Name)
 	c.Redirect(http.StatusFound, "/")
+}
+
+func (controller *Controller) Login(c *gin.Context) {
+	html.Render(c, http.StatusOK, "modules/user/html/login", gin.H{
+		"title": "Login",
+	})
+}
+
+func (controller *Controller) HandleLogin(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "You are logged in.."})
 }

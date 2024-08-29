@@ -40,3 +40,8 @@ func (userService *UserService) Create(request auth.RegisterRequest) (userRespon
 	}
 	return userResponses.ToUser(newUser), nil
 }
+
+func (userService *UserService) CheckUserExists(email string) bool {
+	user := userService.userRepository.FindByEmail(email)
+	return user.ID != 0
+}
