@@ -77,5 +77,38 @@ func (controller *Controller) Login(c *gin.Context) {
 }
 
 func (controller *Controller) HandleLogin(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "You are logged in.."})
+	var request authModels.LoginRequest
+	if err := c.ShouldBind(&request); err != nil {
+		errors.Init()
+		errors.SetFromErrors(err)
+		sessions.Set(c, "errors", converters.MapToString(errors.Get()))
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "old", converters.UrlValuesToString(old.Get()))
+
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	user, err := controller.userService.HandleUserLogin(request)
+	if err != nil {
+		errors.Init()
+		if user.ID != 0 {
+			errors.Add("password", err.Error())
+		} else {
+			errors.Add("email", err.Error())
+		}
+		sessions.Set(c, "errors", converters.MapToString(errors.Get()))
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "old", converters.UrlValuesToString(old.Get()))
+		c.Redirect(http.StatusFound, "/login")
+		return
+	}
+
+	sessions.Set(c, "auth", strconv.Itoa(int(user.ID)))
+	fmt.Printf("User Logged in successfully with a name %s", user.Name)
+	c.Redirect(http.StatusFound, "/")
 }
