@@ -35,3 +35,9 @@ func Get(c *gin.Context, key string) string {
 	}
 	return ""
 }
+
+func Remove(c *gin.Context, key string) {
+	session := sessions.Default(c)
+	session.Delete(key)
+	session.Save()
+}
