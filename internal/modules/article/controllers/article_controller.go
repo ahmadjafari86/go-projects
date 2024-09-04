@@ -1,8 +1,15 @@
 package controllers
 
 import (
+	"blog/internal/modules/article/requests/articles"
 	ArticleService "blog/internal/modules/article/services"
+	"blog/internal/modules/user/helpers"
+	"blog/pkg/converters"
+	"blog/pkg/errors"
 	"blog/pkg/html"
+	"blog/pkg/old"
+	"blog/pkg/sessions"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -32,9 +39,36 @@ func (controller *Controller) Show(c *gin.Context) {
 		return
 	}
 
-	html.Render(c, http.StatusOK, "modules/article/html/show", gin.H{"title": "Article page", "article": article})
+	html.Render(c, http.StatusOK, "modules/article/html/show", gin.H{"title": "Article", "article": article})
 }
 
 func (controller *Controller) Create(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "create post"})
+	html.Render(c, http.StatusOK, "modules/article/html/create", gin.H{"title": "Create article"})
+}
+
+func (controller *Controller) Store(c *gin.Context) {
+	var request articles.StoreRequest
+	if err := c.ShouldBind(&request); err != nil {
+		errors.Init()
+		errors.SetFromErrors(err)
+		sessions.Set(c, "errors", converters.MapToString(errors.Get()))
+
+		old.Init()
+		old.Set(c)
+		sessions.Set(c, "old", converters.UrlValuesToString(old.Get()))
+
+		c.Redirect(http.StatusFound, "/articles/create")
+		return
+	}
+
+	user := helpers.Auth(c)
+
+	article, err := controller.articleService.StoreAsUser(request, user)
+
+	if err != nil {
+		c.Redirect(http.StatusFound, "/articles/create")
+		return
+	}
+
+	c.Redirect(http.StatusFound, fmt.Sprintf("/articles/%d", article.ID))
 }
