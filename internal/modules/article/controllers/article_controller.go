@@ -34,3 +34,7 @@ func (controller *Controller) Show(c *gin.Context) {
 
 	html.Render(c, http.StatusOK, "modules/article/html/show", gin.H{"title": "Article page", "article": article})
 }
+
+func (controller *Controller) Create(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "create post"})
+}
